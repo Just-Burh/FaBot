@@ -89,6 +89,24 @@ module.exports = {
         const tiempo = interaction.options.getString('tiempo');
         const nombreDelCircuito = interaction.options.getString('nombre-del-circuito');
 
+        const allowedRoles = [
+            '976975431574110258',
+            '1277192428205641759',
+            '983140438158504006',
+            '1175980404013027448',
+            '1283983161067311175',
+            '976616892460593173'
+        ];
+
+        const userRoles = interaction.member.roles.cache.map(role => role.id);
+        const hasRole = allowedRoles.some(roleId => userRoles.includes(roleId));
+        if (!hasRole) {
+            return interaction.reply({ content: 'You do not have the required role to use this command.', ephemeral: true });
+        }
+
+        // Acknowledge the interaction immediately
+        await interaction.deferReply({ ephemeral: true });
+
         // Create the embed
         const embed = new EmbedBuilder()
             .setTitle('Características del Circuito')
@@ -105,7 +123,8 @@ module.exports = {
             )
             .setColor(0x00AE86)
             .setTimestamp()
-            .setImage('https://media.discordapp.net/attachments/1047927779292880906/1229158848296648764/Fayfiabanner.png?ex=66e54222&is=66e3f0a2&hm=ca2be8f573369db3a295b1a7fb8c57fe0ee96dd59fcb2c730a5bad23aaeaddd2&=&format=webp&quality=lossless&width=885&height=498'); // Image URL
+            .setImage('https://media.discordapp.net/attachments/1047927779292880906/1229158848296648764/Fayfiabanner.png?ex=66e54222&is=66e3f0a2&hm=ca2be8f573369db3a295b1a7fb8c57fe0ee96dd59fcb2c730a5bad23aaeaddd2&=&format=webp&quality=lossless&width=885&height=498')
+            .setFooter({ text: `Enviado por  ${interaction.user.username}`, iconURL: interaction.user.displayAvatarURL() }); // Footer added here
 
         // Create the buttons
         const row = new ActionRowBuilder()
@@ -124,20 +143,27 @@ module.exports = {
             // Fetch the channel by ID
             const channel = interaction.client.channels.cache.get('1005988966346010634');
             if (!channel) {
-                return interaction.reply({ content: 'Invalid channel ID provided!', ephemeral: true });
+                return await interaction.followUp({ content: 'Invalid channel ID provided!', ephemeral: true });
             }
 
-            // Send the embed with buttons to the specified channel
+            // Send the embed with buttons to the specified channel, including the user mention
             const message = await channel.send({
-                content: '<@&1003352629893681235> <@&977752848555204638> <@&1003353273031475230>',
+                content: `\nEnviado por <@${interaction.user.id}> <@&1003352629893681235> <@&977752848555204638> <@&1003353273031475230>`, // Mention the user who sent the command
                 embeds: [embed],
                 components: [row]
             });
 
-            await interaction.reply({ content: 'Características del circuito enviadas exitosamente!', ephemeral: true });
+            // Reply to the interaction to confirm submission
+            await interaction.followUp({ content: 'Características del circuito enviadas exitosamente!', ephemeral: true });
+
+            // Optionally set a timeout for periodic status updates
+            setTimeout(async () => {
+                await channel.send(`Las características del circuito han sido enviadas y están disponibles para revisión.`);
+            }, 60000); // Send a reminder after 1 minute (60,000 milliseconds)
+
         } catch (error) {
             console.error(error);
-            await interaction.reply({ content: 'Hubo un error al enviar las características del circuito.', ephemeral: true });
+            await interaction.followUp({ content: 'Hubo un error al enviar las características del circuito.', ephemeral: true });
         }
     },
 };

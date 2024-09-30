@@ -26,7 +26,7 @@ module.exports = {
                     { name: '25 minutes', value: '25' },
                     { name: '30 minutes', value: '30' }
                 )),
-
+    
     async execute(interaction) {
         const sesionAplazada = interaction.options.getString('sesion-aplazada');
         const minutosAplazados = interaction.options.getString('minutos-aplazados');
@@ -57,7 +57,8 @@ module.exports = {
             )
             .setColor(0x00AE86)
             .setTimestamp()
-            .setImage('https://media.discordapp.net/attachments/1047927779292880906/1229158848296648764/Fayfiabanner.png?ex=66e54222&is=66e3f0a2&hm=ca2be8f573369db3a295b1a7fb8c57fe0ee96dd59fcb2c730a5bad23aaeaddd2&=&format=webp&quality=lossless&width=885&height=498');
+            .setImage('https://media.discordapp.net/attachments/1047927779292880906/1229158848296648764/Fayfiabanner.png?ex=66e54222&is=66e3f0a2&hm=ca2be8f573369db3a295b1a7fb8c57fe0ee96dd59fcb2c730a5bad23aaeaddd2&=&format=webp&quality=lossless&width=885&height=498')
+            .setFooter({ text: `Enviado por ${interaction.user.username}`, iconURL: interaction.user.displayAvatarURL() }); // Add the footer correctly
 
         try {
             // Fetch the channel by ID

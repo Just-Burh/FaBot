@@ -18,7 +18,7 @@ module.exports = {
                     { name: 'Qualy', value: 'Qualy' },
                     { name: 'Race', value: 'Race' }
                 )),
-
+    
     async execute(interaction) {
         const ip = interaction.options.getString('ip');
         const session = interaction.options.getString('session');
@@ -44,10 +44,11 @@ module.exports = {
         // Create the embed with the session and IP
         const embed = new EmbedBuilder()
             .setTitle('Nueva Sesion')
-            .setDescription(`La direccion IP es: ${ip}\nLa Sesion es: ${session}`)
+            .setDescription(`La dirección IP es: ${ip}\nLa Sesión es: ${session}`)
             .setImage('https://media.discordapp.net/attachments/1047927779292880906/1229158848296648764/Fayfiabanner.png?ex=66e54222&is=66e3f0a2&hm=ca2be8f573369db3a295b1a7fb8c57fe0ee96dd59fcb2c730a5bad23aaeaddd2&=&format=webp&quality=lossless&width=885&height=498')
             .setColor(0x00AE86)
-            .setTimestamp();
+            .setTimestamp()
+            .setFooter({ text: `Enviado por ${interaction.user.username}`, iconURL: interaction.user.displayAvatarURL() });
 
         try {
             // Fetch the channel by ID
@@ -56,10 +57,10 @@ module.exports = {
                 return interaction.reply({ content: 'Invalid channel ID provided!', ephemeral: true });
             }
 
-            // Send the embed to the specified channel
+            // Send the embed to the specified channel along with role mentions and user mention
             await channel.send({
                 embeds: [embed],
-                content: '<@&1003352629893681235> <@&977752848555204638> <@&1003353273031475230>'
+                content: `<@${interaction.user.id}> <@&1003352629893681235> <@&977752848555204638> <@&1003353273031475230>`
             });
 
             await interaction.reply({ content: 'Embed sent successfully!', ephemeral: true });
