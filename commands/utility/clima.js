@@ -6,17 +6,18 @@ module.exports = {
         .setName('clima') // Nombre del comando
         .setDescription('Obtener la información actual del clima.') // Descripción 
         .addStringOption(option =>
-            option.setName('ciudad') //  opción para que el usuario ingrese una ciudad
+            option.setName('ciudad') // Opción para que el usuario ingrese una ciudad
                 .setDescription('Ciudad para obtener el clima') // Descripción de la opción
-                .setRequired(true)), // E opción es obligatoria ya que si no se da nombre de ciudad da error 🗿
+                .setRequired(true)), // Esta opción es obligatoria
+
     async execute(interaction) {
         // Almacenamos el nombre de la ciudad proporcionada por el usuario
         const city = interaction.options.getString('ciudad');
 
         // Obtenemos la API key de OpenWeatherMap del archivo .env
-        const apiKey = process.env.OPENWEATHERMAP_API_KEY; // Es necesario configurar la API key en el .env porque si no el bot dara error siempre
+        const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
-        // Creamos la URL de la API usando el nombre de la ciudad y la API key, con unidades en métrico (°C) porque nadie en su sano juicio usa el imperial
+        // Creamos la URL de la API usando el nombre de la ciudad y la API key
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
         try {
@@ -26,8 +27,8 @@ module.exports = {
 
             // Obtenemos los datos específicos del clima
             const temp = weather.main.temp; // Temperatura actual
-            const description = weather.weather[0].description; // Descripción del clima (ej. "lluvia ligera")
-            const icon = weather.weather[0].icon; // Icono del clima, para usarlo en el thumbnail
+            const description = weather.weather[0].description; // Descripción del clima
+            const icon = weather.weather[0].icon; // Icono del clima
 
             // Obtenemos un emoji adecuado dependiendo de la descripción del clima
             const emoji = getWeatherEmoji(description);
@@ -39,7 +40,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#1E90FF') // Color del embed
                 .setTitle(`Clima en ${city}`) // Título que muestra la ciudad
-                .setDescription(`${emoji} ${description.charAt(0).toUpperCase() + description.slice(1)}`) // Mostramos la descripción del clima con el emoji
+                .setDescription(`${emoji} ${description.charAt(0).toUpperCase() + description.slice(1)}`) // Descripción del clima
                 .addFields(
                     { name: 'Temperatura', value: `${temp}°C`, inline: true }, // Campo de la temperatura actual
                     { name: 'Sensación térmica', value: `${weather.main.feels_like}°C`, inline: true }, // Sensación térmica
@@ -47,11 +48,12 @@ module.exports = {
                     { name: 'Posibilidad de lluvia (Última hora)', value: `${rain > 0 ? `${rain} mm` : 'Sin lluvia'}`, inline: true } // Información sobre la lluvia
                 )
                 .setThumbnail(`http://openweathermap.org/img/wn/${icon}.png`) // Icono del clima
-                .setTimestamp() // fecha y hora actual
+                .setTimestamp() // Fecha y hora actual
                 .setFooter({ text: 'Información del clima proporcionada por OpenWeatherMap' }); // Pie de página con la fuente de la información
 
-            // Enviamos el embed al canal de Discord
-            await interaction.reply({ embeds: [embed] });
+            // Respondemos a la interacción sin un tiempo límite de respuesta
+            await interaction.deferReply(); // Deferrir la respuesta para indicar que se está procesando
+            await interaction.editReply({ embeds: [embed] }); // Editar la respuesta una vez que se ha procesado la información
         } catch (error) {
             // Si ocurre un error (por ejemplo, si la ciudad no es válida o hay un problema con la API), lo manejamos aquí
             console.error(error); // Imprimimos el error en la consola
