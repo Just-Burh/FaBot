@@ -11,6 +11,8 @@ Este es un **bot en desarrollo (WIP)** diseñado para la administración del ser
 ### Comandos Principales
 - `/fban [usuario] [motivo]`: Banea a un usuario del servidor con un motivo especificado.
 - `/clima [ubicación]`: Muestra las condiciones climáticas actuales para una ubicación especificada.
+- `/uploadmpr [archivo .mpr]`: Guarda localmente archivos .mpr para distribucion a los usuarios de manera posterior.
+- `/sendmpr`: Envia los archivos .mpr para distribucion a los usuarios.
 - **¡Más comandos próximamente!**
 
 ## Cómo Empezar
