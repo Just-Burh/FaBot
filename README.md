@@ -29,7 +29,7 @@ Asegúrate de tener instalado lo siguiente:
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/Just-Burh/DcBot.git
+   git clone https://github.com/Just-Burh/FaBot.git
    cd DcBot
    ```
 
