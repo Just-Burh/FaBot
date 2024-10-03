@@ -1,4 +1,4 @@
-# Bot de Simracing Formula Argentina
+# Bot de Simracing Formula Argentina (WIP)
 
 Este es un **bot en desarrollo (WIP)** diseñado para la administración del servidor de Discord de la comunidad de simracing de Formula Argentina. El bot incluye comandos administrativos, así como algunos comandos misceláneos como consultar el clima, entre otros.
 
