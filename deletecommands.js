@@ -1,27 +1,30 @@
+// Carga las variables de entorno desde el archivo .env
 require('dotenv').config();
-const { REST, Routes } = require('discord.js');
+const { REST, Routes } = require('discord.js'); // Importa los módulos necesarios para interactuar con la API de Discord
 
-// Load environment variables
-const clientId = process.env.CLIENT_ID;
-const guildId = process.env.GUILD_ID;
-const token = process.env.TOKEN;
+// Carga las variables de entorno
+const clientId = process.env.CLIENT_ID; // ID de la aplicación de Discord
+const guildId = process.env.GUILD_ID; // ID del servidor (guild) donde se eliminarán los comandos
+const token = process.env.TOKEN; // Token de autenticación de la aplicación
 
-// Create an instance of the REST module and set the token
+// Crea una instancia del módulo REST y establece el token de autenticación
 const rest = new REST().setToken(token);
 
+// Función autoejecutable para eliminar comandos
 (async () => {
     try {
-        console.log('Started deleting all application (/) commands.');
+        console.log('Iniciando la eliminación de todos los comandos (/) de la aplicación.');
 
-        // Delete all guild-specific commands
+        // Elimina todos los comandos específicos del servidor (guild)
         await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] });
-        console.log('Successfully deleted all guild-specific commands.');
+        console.log('Se han eliminado correctamente todos los comandos específicos del servidor.');
 
-        // Delete all global commands
+        // Elimina todos los comandos globales
         await rest.put(Routes.applicationCommands(clientId), { body: [] });
-        console.log('Successfully deleted all global commands.');
+        console.log('Se han eliminado correctamente todos los comandos globales.');
 
     } catch (error) {
-        console.error(error);
+        // Manejo de errores: si ocurre un error, se muestra en la consola
+        console.error('Error al eliminar los comandos:', error);
     }
 })();

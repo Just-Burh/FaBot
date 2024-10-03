@@ -1,8 +1,9 @@
+// Importa las librerías necesarias de Discord
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs'); // Para manipulación de archivos
+const path = require('path'); // Para trabajar con rutas de archivos
 
-// Define allowed roles
+// Define los roles permitidos que pueden usar este comando
 const allowedRoles = [
     '976975431574110258',
     '1277192428205641759',
@@ -12,46 +13,48 @@ const allowedRoles = [
     '976616892460593173'
 ];
 
-// Command for sending .mpr files
+// Comando para enviar archivos .mpr
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('sendmpr')
-    .setDescription('Sends all .mpr files stored for this weekend.'),
+    .setName('sendmpr') // Nombre del comando
+    .setDescription('Sends all .mpr files stored for this weekend.'), // Descripción del comando
 
   async execute(interaction) {
-    // Path to the folder where .mpr files for the weekend are stored
+    // Ruta a la carpeta donde se almacenan los archivos .mpr para el fin de semana
     const weekendDir = path.join(__dirname, 'mpr_files', 'weekend');
 
-    // Defer reply to give time for file handling
+    // Deferir la respuesta para dar tiempo al manejo de archivos
     await interaction.deferReply();
 
-    // Check if the folder exists and contains any .mpr files
+    // Verificar si la carpeta existe y contiene archivos .mpr
     if (!fs.existsSync(weekendDir)) {
       return interaction.editReply({ content: 'No .mpr files have been uploaded for this weekend.' });
     }
 
-    // Read .mpr files (case insensitive)
+    // Leer los archivos .mpr (insensible a mayúsculas)
     const mprFiles = fs.readdirSync(weekendDir).filter(file => file.toLowerCase().endsWith('.mpr'));
 
+    // Comprobar si hay archivos .mpr
     if (mprFiles.length === 0) {
       return interaction.editReply({ content: 'No .mpr files have been uploaded for this weekend.' });
     }
 
-    // Create an object to group files by session
+    // Crear un objeto para agrupar los archivos por sesión
     const groupedFiles = {
-      FP1: [],
-      FP2: [],
-      QU1: [],
-      QU2: [],
-      QU3: [],
-      RAC: []
+      FP1: [], // Free Practice 1
+      FP2: [], // Free Practice 2
+      QU1: [], // Qualifying 1
+      QU2: [], // Qualifying 2
+      QU3: [], // Qualifying 3
+      RAC: []  // Race
     };
 
-    // Group files by their session based on file names (case insensitive)
+    // Agrupar archivos por su sesión basada en los nombres de los archivos (insensible a mayúsculas)
     mprFiles.forEach(file => {
-      const session = file.substring(0, 3).toUpperCase(); // Extract the first three characters for the session
-      console.log(`Processing file: ${file}, Session: ${session}`); // Log the processing file and its session
+      const session = file.substring(0, 3).toUpperCase(); // Extraer los primeros tres caracteres para la sesión
+      console.log(`Processing file: ${file}, Session: ${session}`); // Registrar el archivo en procesamiento y su sesión
       
+      // Agrupar según el tipo de sesión
       if (session === 'Q1') {
         groupedFiles.QU1.push(file);
       } else if (session === 'Q2') {
@@ -61,39 +64,41 @@ module.exports = {
       } else if (session === 'RAC') {
         groupedFiles.RAC.push(file);
       } else {
-        groupedFiles[session] ? groupedFiles[session].push(file) : console.log(`Warning: Unrecognized session - ${session}`); // Log unrecognized sessions
+        // Registrar sesiones no reconocidas
+        groupedFiles[session] ? groupedFiles[session].push(file) : console.log(`Warning: Unrecognized session - ${session}`);
       }
     });
 
-    console.log('Grouped Files:', groupedFiles); // Log the grouped files for debugging
+    console.log('Grouped Files:', groupedFiles); // Registrar los archivos agrupados para depuración
 
-    // Prepare messages to send
+    // Preparar mensajes para enviar
     const messages = [];
 
+    // Crear mensajes para cada sesión con archivos
     for (const session in groupedFiles) {
       if (groupedFiles[session].length > 0) {
         const attachments = groupedFiles[session].map(file => {
-          const filePath = path.join(weekendDir, file);
-          return { attachment: filePath, name: file };
+          const filePath = path.join(weekendDir, file); // Ruta completa del archivo
+          return { attachment: filePath, name: file }; // Preparar el archivo para el mensaje
         });
 
         messages.push({
-          content: `Here are the .mpr files for **${session}**:`,
-          files: attachments
+          content: `Aqui esta el archivo mpr de la sesion  **${session}**:`, // Mensaje que se enviará
+          files: attachments // Archivos adjuntos
         });
       }
     }
 
-    // Send each message in order
+    // Enviar cada mensaje en orden
     for (const message of messages) {
-      await interaction.followUp(message);
+      await interaction.followUp(message); // Enviar el mensaje
     }
 
-    // If no messages were prepared, inform the user
+    // Si no se prepararon mensajes, informar al usuario
     if (messages.length === 0) {
-      await interaction.followUp({ content: 'No .mpr files available for the specified sessions.' });
+      await interaction.followUp({ content: 'No hay archivos .mpr para las sesiones especificadas.' });
     } else {
-      await interaction.editReply({ content: 'Finished sending all .mpr files.', ephemeral: true });
+      await interaction.editReply({ content: 'Todos los archivos fueron enviados de manera correcta.', ephemeral: true }); // Confirmar el envío de archivos
     }
   },
 };
